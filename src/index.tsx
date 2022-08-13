@@ -1,8 +1,6 @@
 import { render } from "solid-js/web";
 
-function App() {
-  return <div>hibro</div>;
-}
+import App from "./app";
 
 const cleanup = render(App, document.getElementById("root")!);
 if (import.meta.hot) {

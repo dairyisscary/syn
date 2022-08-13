@@ -21,3 +21,8 @@
     }
   }
 }
+
+#draw-area {
+  background-image: radial-gradient(#21202e 20%, transparent 20%);
+  background-size: 12px 12px;
+}
