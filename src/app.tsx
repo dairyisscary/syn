@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 import { Doc, Map as YMap } from "yjs";
 import { WebrtcProvider } from "y-webrtc";
+import { IndexeddbPersistence } from "y-indexeddb";
 
 import DrawArea from "./draw";
 import { getRandomRPColorName } from "./color";
@@ -17,6 +18,8 @@ type DraggingBoxPosition = {
 function createAppState() {
   const doc = new Doc();
   const networkProvider = new WebrtcProvider("syn-global-room", doc);
+  new IndexeddbPersistence("syn-index-db", doc);
+
   const { localUser, remoteUsers, handleLogin, handleCursorPositionChange } =
     createAwarenessUsers(networkProvider);
   const boxes = doc.getArray<YMap<any>>("boxes");
