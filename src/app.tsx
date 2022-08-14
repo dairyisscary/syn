@@ -11,6 +11,7 @@ import { createSyncArray } from "./sync";
 type Position = { top: number; left: number };
 
 type DraggingBoxPosition = {
+  type: "move" | "resize";
   index: number;
   position: Position;
 };
@@ -46,14 +47,22 @@ function createAppState() {
       if (!draggingPos) {
         return;
       }
-      const { index, position } = draggingPos;
+      const { index, position, type } = draggingPos;
       const box = boxes.get(index);
-      const boxPosition = box.get("position");
-      box.set("position", {
-        top: boxPosition.top + newPosition.top - position.top,
-        left: boxPosition.left + newPosition.left - position.left,
-      });
-      setDraggingBoxPosition({ index, position: newPosition });
+      if (type === "move") {
+        const boxPosition = box.get("position");
+        box.set("position", {
+          top: boxPosition.top + newPosition.top - position.top,
+          left: boxPosition.left + newPosition.left - position.left,
+        });
+      } else {
+        const boxSize = box.get("size");
+        box.set("size", {
+          height: Math.max(50, boxSize.height + newPosition.top - position.top),
+          width: Math.max(50, boxSize.width + newPosition.left - position.left),
+        });
+      }
+      setDraggingBoxPosition({ type, index, position: newPosition });
     },
     releaseCursor(position: Position) {
       if (!localUser()) {

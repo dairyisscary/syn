@@ -20,12 +20,16 @@ type Props = {
   remoteUsers: { name: string; cursor?: Position }[];
   onMoveCursor: (newPosition: Position) => void;
   onDrawPointerUp: (position: Position) => void;
-  onBoxPointerDown: (data: { index: number; position: Position }) => void;
+  onBoxPointerDown: (data: {
+    type: "move" | "resize";
+    index: number;
+    position: Position;
+  }) => void;
   dragState: "none" | "ready" | "dragging";
 };
 
 function Box(props: {
-  onPointerDown: (evt: PointerEvent) => void;
+  onPointerDown: (evt: PointerEvent, type: "resize" | "move") => void;
   dragState: Props["dragState"];
   box: YMap<any>;
 }) {
@@ -34,10 +38,15 @@ function Box(props: {
     "position",
     "color",
   ]);
+  let handleRef: HTMLDivElement | undefined;
   return (
     <div
-      class="absolute rounded top-0 left-0 border border-base"
-      onPointerDown={props.onPointerDown}
+      class="absolute flex items-end justify-end rounded top-0 left-0 border border-base"
+      onPointerDown={(event) => {
+        if (event.target !== handleRef) {
+          props.onPointerDown(event, "move");
+        }
+      }}
       style={{
         cursor:
           props.dragState === "dragging"
@@ -50,7 +59,16 @@ function Box(props: {
         height: `${size().height}px`,
         transform: `translate(${position().left}px, ${position().top}px)`,
       }}
-    />
+    >
+      <div
+        ref={handleRef}
+        class="h-3 w-3 rounded-br border-r-2 border-b-2 border-base mb-1 mr-1"
+        style={{ cursor: props.dragState === "none" ? undefined : "se-resize" }}
+        onPointerDown={(event) => {
+          props.onPointerDown(event, "resize");
+        }}
+      />
+    </div>
   );
 }
 
@@ -105,8 +123,9 @@ function DrawArea(props: Props) {
           <Box
             box={box}
             dragState={props.dragState}
-            onPointerDown={(evt) => {
+            onPointerDown={(evt, type) => {
               props.onBoxPointerDown({
+                type,
                 index: index(),
                 position: { left: evt.clientX, top: evt.clientY },
               });
