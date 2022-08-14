@@ -20,6 +20,7 @@ type Props = {
   remoteUsers: { name: string; cursor?: Position }[];
   onMoveCursor: (newPosition: Position) => void;
   onDrawPointerUp: (position: Position) => void;
+  onBoxDelete: (index: number) => void;
   onBoxPointerDown: (data: {
     type: "move" | "resize";
     index: number;
@@ -30,6 +31,7 @@ type Props = {
 
 function Box(props: {
   onPointerDown: (evt: PointerEvent, type: "resize" | "move") => void;
+  onDblClick: () => void;
   dragState: Props["dragState"];
   box: YMap<any>;
 }) {
@@ -42,6 +44,7 @@ function Box(props: {
   return (
     <div
       class="absolute flex items-end justify-end rounded top-0 left-0 border border-base"
+      onDblClick={props.onDblClick}
       onPointerDown={(event) => {
         if (event.target !== handleRef) {
           props.onPointerDown(event, "move");
@@ -123,6 +126,7 @@ function DrawArea(props: Props) {
           <Box
             box={box}
             dragState={props.dragState}
+            onDblClick={() => props.onBoxDelete(index())}
             onPointerDown={(evt, type) => {
               props.onBoxPointerDown({
                 type,

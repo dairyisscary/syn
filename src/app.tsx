@@ -38,6 +38,12 @@ function createAppState() {
         setDraggingBoxPosition(newDraggingPostion);
       }
     },
+    boxDelete(index: number) {
+      if (localUser()) {
+        setDraggingBoxPosition(null);
+        boxes.delete(index);
+      }
+    },
     moveCursor(newPosition: Position) {
       handleCursorPositionChange(newPosition);
       if (!localUser()) {
@@ -89,6 +95,7 @@ function App() {
         onMoveCursor={state.moveCursor}
         onDrawPointerUp={state.releaseCursor}
         onBoxPointerDown={state.boxCursorDown}
+        onBoxDelete={state.boxDelete}
         boxes={state.boxes()}
         remoteUsers={state.remoteUsers()}
         dragState={
